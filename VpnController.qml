@@ -34,7 +34,7 @@ Item {
   // Set when the user picks a chip; "" follows `preferredBackend`.
   property string selectedId: ""
 
-  readonly property var backends: [proton, mullvad, windscribe, networkManager]
+  readonly property var backends: [proton, mullvad, windscribe, warp, networkManager]
   // Tools this machine has. Hiding one is a statement about the widget, not
   // about the machine, so the settings view lists these — including the hidden
   // ones, which would otherwise be unreachable once they were switched off.
@@ -364,6 +364,11 @@ Item {
 
   WindscribeBackend {
     id: windscribe
+    settings: root.settings
+  }
+
+  WarpBackend {
+    id: warp
     settings: root.settings
   }
 
