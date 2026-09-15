@@ -235,6 +235,19 @@ function warpSetupHint(probe) {
   return ""
 }
 
+// The command that clears `warpSetupHint`, for the panel to run in a terminal
+// when the hint is clicked. Every case needs a person at the keyboard: the terms
+// prompt, and sudo's password for starting the service. Registering is the one
+// that needs no answer, but it goes through the same terminal so its output — the
+// new device and account — is seen rather than discarded.
+function warpSetupCommand(probe) {
+  if (!probe || !probe.present) return ""
+  if (probe.needsTos) return "warp-cli registration show"
+  if (probe.daemonDown) return "sudo systemctl enable --now warp-svc"
+  if (!probe.registered) return "warp-cli registration new"
+  return ""
+}
+
 function describeWarpFailure(output, fallback) {
   var text = String(output || "").trim()
   if (warpNeedsTos(text)) return "Accept the WARP terms once: run warp-cli registration show in a terminal"
