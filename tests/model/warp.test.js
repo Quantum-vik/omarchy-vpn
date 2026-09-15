@@ -197,6 +197,8 @@ test("warpTargets offers only the modes that tunnel traffic", () => {
   const targets = Warp.warpTargets()
   eq(targets.map(t => t.key), ["mode:warp", "mode:warp+doh"])
   eq(targets[0].args, ["warp"])
+  // Plain WARP already tunnels DNS; the DoH row must not claim to be what encrypts it.
+  eq(targets[1].detail, "Same tunnel, plus DNS over HTTPS")
   eq(Warp.warpIsTunnelMode("doh"), false)
   eq(Warp.warpIsTunnelMode("proxy"), false)
   eq(Warp.warpIsTunnelMode("warp+doh"), true)

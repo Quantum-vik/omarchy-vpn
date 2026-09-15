@@ -151,9 +151,13 @@ function parseWarpStats(raw) {
 // The modes that put traffic through the tunnel. DNS-only (`doh`, `dot`) and
 // `proxy` leave the rest of the machine's traffic outside it, so offering them
 // in a VPN switcher would show a connected tunnel that carries nothing.
+//
+// Plain `warp` already sends DNS through the encrypted tunnel, so the second
+// row must not read as the one that encrypts DNS: `warp+doh` only changes how
+// warp-svc's DNS proxy forwards lookups (DoH instead of UDP).
 var WARP_MODES = [
   { mode: "warp", label: "WARP", detail: "All traffic through Cloudflare" },
-  { mode: "warp+doh", label: "WARP with DNS over HTTPS", detail: "All traffic, DNS encrypted to 1.1.1.1" }
+  { mode: "warp+doh", label: "WARP with DNS over HTTPS", detail: "Same tunnel, plus DNS over HTTPS" }
 ]
 
 function warpModeLabel(mode) {
