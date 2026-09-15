@@ -206,9 +206,12 @@ Item {
       // after a good one keeps the device listed, and with it the chip that is
       // the only way to see why WARP stopped answering.
       if (exitCode === 0 && !root._needsTos) root.registration = parsed
-      // No refresh() from here: detect() probes and nothing else, since a
-      // hidden backend is given detect() alone. The controller's next poll
-      // reads the status of a backend that is not hidden.
+      // One status read belongs to the probe, as Windscribe's does: the
+      // controller's refresh() for this round already ran and returned while
+      // `detected` was still false, so without it a live tunnel would read as
+      // "Not connected" until the next poll. Not refresh(), which would also
+      // start polling settings for a backend that may be hidden.
+      if (root.detected && !statusProcess.running) statusProcess.running = true
     }
   }
 
