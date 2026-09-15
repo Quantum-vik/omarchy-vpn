@@ -231,6 +231,20 @@ test("warpSetupHint says what stops the backend from appearing", () => {
   eq(Warp.warpSetupHint({ present: true, registered: true }), "")
 })
 
+test("warpSetupCommand runs what the hint names, and nothing once set up", () => {
+  eq(Warp.warpSetupCommand({ present: false }), "")
+  eq(Warp.warpSetupCommand({ present: true, needsTos: true }), "warp-cli registration show")
+  eq(Warp.warpSetupCommand({ present: true, daemonDown: true }), "sudo systemctl enable --now warp-svc")
+  eq(Warp.warpSetupCommand({ present: true, registered: false }), "warp-cli registration new")
+  eq(Warp.warpSetupCommand({ present: true, registered: true }), "")
+  // The hint and the command always describe the same case, in the same order.
+  for (const probe of [{ present: true, needsTos: true, daemonDown: true }, { present: true, daemonDown: true, registered: false }]) {
+    const hint = Warp.warpSetupHint(probe)
+    const command = Warp.warpSetupCommand(probe)
+    eq(hint.indexOf(command.replace(/^sudo /, "")) !== -1, true)
+  }
+})
+
 test("warp failures are recognised from warp-cli's own messages", () => {
   eq(Warp.warpNeedsTos(TOS), true)
   eq(Warp.warpDaemonUnreachable("Unable to connect to the CloudflareWARP daemon: Connection refused (os error 111)"), true)

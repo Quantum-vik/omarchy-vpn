@@ -50,12 +50,15 @@ Item {
   // and one whose terms were never accepted refuses every command.
   readonly property bool detected: _present && registration.registered
 
-  readonly property string setupHint: Warp.warpSetupHint({
+  readonly property var _probe: ({
     present: _present,
     needsTos: _needsTos,
     daemonDown: _daemonDown,
     registered: registration.registered
   })
+  readonly property string setupHint: Warp.warpSetupHint(_probe)
+  // What the panel runs in a terminal when that hint is clicked.
+  readonly property string setupCommand: Warp.warpSetupCommand(_probe)
 
   // Optimistic connection state so the switch flips the instant you click it.
   // -1 follows warp-svc, 0/1 while a connect/disconnect is still in flight.

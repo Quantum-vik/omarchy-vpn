@@ -187,8 +187,9 @@ Set them with `warp-cli mode` if you want them.
 
 The widget never passes `--accept-tos`. Without a terminal, `warp-cli` refuses
 every command until WARP's terms were accepted once, and agreeing to them is for
-you to do — run `warp-cli registration show` in a terminal and answer the prompt.
-Until then the panel says so instead of listing WARP.
+you to do. Until then the panel says so instead of listing WARP; click that line
+and it opens a terminal running `warp-cli registration show`, where you answer
+the prompt yourself, then reopen the panel.
 
 Switching to another tool runs `warp-cli disconnect`, which also turns off
 WARP's own Always On, so it stays off until you connect it again.
@@ -319,6 +320,7 @@ omarchy-shell jkoestinger.vpn use mullvad  # switch the panel's active tool
 omarchy-shell jkoestinger.vpn connect CH   # country code, region or profile name, or row key
 omarchy-shell jkoestinger.vpn quickconnect # each tool's default connection
 omarchy-shell jkoestinger.vpn disconnect
+omarchy-shell jkoestinger.vpn setup        # run the setup hint's command in a terminal
 omarchy-shell jkoestinger.vpn toggle       # open or close the panel
 ```
 

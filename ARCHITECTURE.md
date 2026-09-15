@@ -86,6 +86,14 @@ and what would change that. The panel shows the first non-empty hint in place
 of its own "install a VPN tool" line, which is the wrong advice for a tool that
 is installed and merely has nothing to connect to yet.
 
+A backend with a `setupHint` may add `setupCommand`: the shell command that
+clears it, such as `warp-cli registration show`. The panel then draws the hint
+as clickable and runs the command in a floating terminal — the same path as
+`authRequired` — because what it fixes needs a person at the keyboard: a terms
+prompt, a sudo password, a sign-in. The controller takes the command from the
+same backend whose hint it shows, so the line and what clicking it runs never
+disagree. It is also on IPC as `setup`.
+
 ## Adding a backend
 
 Say the tool is called Tunnelbear.
