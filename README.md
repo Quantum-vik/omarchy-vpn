@@ -4,7 +4,7 @@ A VPN widget for the Omarchy bar. One icon shows whether you are behind a
 tunnel; one panel connects, disconnects, and switches between the VPN tools you
 actually have installed.
 
-It supports **Proton VPN**, **Mullvad**, **Windscribe**, and the **OpenVPN**, **OpenConnect** and
+It supports **Proton VPN**, **Mullvad**, **Windscribe**, **Cloudflare WARP**, and the **OpenVPN**, **OpenConnect** and
 **WireGuard** profiles NetworkManager holds. Only the tools
 that have something to offer appear — install none and the widget tells you so;
 have several and a chip row lets you switch between them.
@@ -91,6 +91,9 @@ Omarchy with its Quickshell desktop, plus at least one of:
   (`mullvad account login <number>`).
 - **Windscribe** — `windscribe-cli` with the Windscribe app running, logged in
   (`windscribe-cli login`).
+- **Cloudflare WARP** — `warp-cli` with `warp-svc` running, the device
+  registered (`warp-cli registration new`), and WARP's terms accepted once in a
+  terminal.
 - **OpenVPN, WireGuard, OpenConnect or VPNC** — `nmcli`, plus `openvpn`, `wg`
   (wireguard-tools), `networkmanager-openconnect`, or `networkmanager-vpnc`,
   with at least one profile imported into NetworkManager.
@@ -105,7 +108,7 @@ Configure these in **Setup › Plugins**, or in the widget's entry in
 | `refreshIntervalSec` | `15` | How often the connection status is polled |
 | `preferredBackend` | `Auto` | Which tool the panel opens on. `Auto` picks whichever is connected |
 | `favoriteCountries` | `CH,NL,US` | Country codes pinned to the top of the Proton VPN and Mullvad lists. Windscribe has no codes, so it matches names instead — see below |
-| `hiddenBackends` | *(empty)* | Tools the widget ignores entirely: `proton`, `mullvad`, `windscribe`, `networkmanager`. The gear inside the panel writes this |
+| `hiddenBackends` | *(empty)* | Tools the widget ignores entirely: `proton`, `mullvad`, `windscribe`, `warp`, `networkmanager`. The gear inside the panel writes this |
 
 ## Mullvad
 
@@ -168,6 +171,27 @@ run while another copy of itself is running, exiting with `Windscribe CLI is
 already running` rather than waiting its turn. The widget serialises its own calls
 and retries the ones that lose the race, so a command you run yourself at a
 terminal costs the panel a moment and nothing more.
+
+## Cloudflare WARP
+
+WARP is not a pick-a-country VPN. Cloudflare routes through the data centre
+nearest you and keeps your own country as the exit location, so the list offers
+WARP's tunnel modes instead of places: **WARP** (all traffic through Cloudflare)
+and **WARP with DNS over HTTPS**. Picking one sets `warp-cli mode` if it differs,
+then connects. While connected the panel shows the data centre, mode, protocol,
+latency and account type.
+
+DNS-only (`doh`, `dot`) and proxy modes are left out: they carry none of the
+machine's other traffic, so the switch would show a tunnel that protects nothing.
+Set them with `warp-cli mode` if you want them.
+
+The widget never passes `--accept-tos`. Without a terminal, `warp-cli` refuses
+every command until WARP's terms were accepted once, and agreeing to them is for
+you to do — run `warp-cli registration show` in a terminal and answer the prompt.
+Until then the panel says so instead of listing WARP.
+
+Switching to another tool runs `warp-cli disconnect`, which also turns off
+WARP's own Always On, so it stays off until you connect it again.
 
 ## NetworkManager profiles
 
@@ -290,7 +314,7 @@ it:
 ```bash
 omarchy-shell jkoestinger.vpn status       # "Proton VPN · CH#1129 · Zurich, Switzerland"
 omarchy-shell jkoestinger.vpn ip           # current public address
-omarchy-shell jkoestinger.vpn backends     # "proton mullvad windscribe networkmanager"
+omarchy-shell jkoestinger.vpn backends     # "proton mullvad windscribe warp networkmanager"
 omarchy-shell jkoestinger.vpn use mullvad  # switch the panel's active tool
 omarchy-shell jkoestinger.vpn connect CH   # country code, region or profile name, or row key
 omarchy-shell jkoestinger.vpn quickconnect # each tool's default connection
