@@ -18,8 +18,10 @@ surrounding workflow.
 | `WindscribeBackend.qml` | Windscribe, via `windscribe-cli` |
 | `WarpBackend.qml` | Cloudflare WARP, via `warp-cli` |
 | `NetworkManagerBackend.qml` | OpenVPN, WireGuard, OpenConnect and VPNC, via NetworkManager |
+| `AmneziaWgBackend.qml` | AmneziaWG, via `awg` and `awg-quick` |
+| `NetworkManagerBackend.qml` | OpenVPN, WireGuard, OpenConnect and VPNC, via NetworkManager |
 | `model/Shared.js` | Helpers every backend leans on, and the widget's own settings |
-| `model/Proton.js`, `model/Mullvad.js`, `model/Windscribe.js`, `model/Warp.js`, `model/NetworkManager.js` | Pure parsing and row-building, one file per tool. No QML, no side effects |
+| `model/Proton.js`, `model/Mullvad.js`, `model/Windscribe.js`, `model/Warp.js`, `model/AmneziaWg.js`, `model/NetworkManager.js` | Pure parsing and row-building, one file per tool. No QML, no side effects |
 
 Each backend is a pair: the `.qml` file holds the `Process` plumbing, and the
 matching `model/*.js` holds everything that can be decided without running a
@@ -39,7 +41,7 @@ duck-types, so a backend that omits something simply renders as blank.
 
 | Property | Meaning |
 |----------|---------|
-| `backendId` | Stable key used by settings and IPC (`proton`, `mullvad`, `windscribe`, `warp`, `networkmanager`) |
+| `backendId` | Stable key used by settings and IPC (`proton`, `mullvad`, `windscribe`, `warp`, `amneziawg`, `networkmanager`) |
 | `label` | Name on the switcher chip and hero. Also what `preferredBackend` stores, so it must match that enum in `manifest.json` exactly |
 | `installNames` | What a user would install to make this backend useful, as a list. The panel joins them into its "install something" line when no tool is detected. Usually one name and the same as `label` — NetworkManager is the exception, offering `["OpenVPN", "WireGuard", "OpenConnect", "VPNC"]`, because nobody installs a connection manager to get a VPN |
 | `glyph` | Nerd Font character for the hero icon |
@@ -73,8 +75,9 @@ so the controller can call it unconditionally.
 
 `toggleConnection()` is the backend's own idea of a default connection — Proton
 picks the fastest server; Mullvad reuses its stored relay constraint; Windscribe
-takes its best location; NetworkManager connects the only profile if there is
-exactly one, and otherwise asks the user to pick.
+takes its best location; AmneziaWG connects the only local profile if there is
+exactly one, and otherwise asks the user to pick; NetworkManager does the same
+for its profiles.
 
 A backend may also expose `lockdownMode`, meaning "this tool blocks all traffic
 while it is disconnected". The controller warns about it before tearing that
@@ -480,7 +483,7 @@ Check a manifest change with `omarchy plugin validate .` before committing.
 
 ## Tests
 
-The `model/` files are where every assumption about how four CLIs format their
+The `model/` files are where every assumption about how five CLIs format their
 output lives, and they are the only half of the widget that runs without a QML
 engine. The suite covers them:
 
